@@ -13,13 +13,20 @@ import '../../index.css';
 import styles from './app.module.css';
 
 import { AppHeader, IngredientDetails, Modal, OrderInfo } from '@components';
-import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import {
+  Route,
+  Routes,
+  useLocation,
+  useMatch,
+  useNavigate
+} from 'react-router-dom';
 // Добавляем защищенный маршрут
 import { ProtectedRoute } from '../protected-route';
 import { useDispatch } from '../../services/store';
 import { useEffect } from 'react';
 import { getIngredients } from '../../slices/ingredients-slice/ingredients-slice';
 import { getUser } from '../../slices/user-slice/user-slice';
+import { Wrapper } from '../wrapper/Wrapper';
 
 const App = () => {
   // Отправка дейсвий диспетчеру
@@ -37,6 +44,9 @@ const App = () => {
   const closeModal = () => {
     navigate(backgroundLocation || '/');
   };
+  const profileMatch = useMatch('/profile/orders/:id')?.params.id;
+  const feedMatch = useMatch('/feed/:id')?.params.id;
+  const orderNumber = profileMatch || feedMatch;
 
   return (
     <div className={styles.app}>
@@ -45,13 +55,36 @@ const App = () => {
         {/* Главная страница */}
         <Route path='/' element={<ConstructorPage />} />
         {/* Лента заказов */}
+        <Route
+          path='/feed/:id'
+          element={
+            <Wrapper title={`#${orderNumber}`}>
+              <OrderInfo />
+            </Wrapper>
+          }
+        />
         <Route path='/feed' element={<Feed />} />
         {/* Ингредиенты по их ID */}
-        <Route path='/ingredients/:id' element={<IngredientDetails />} />
+        <Route
+          path='/ingredients/:id'
+          element={
+            <Wrapper title={'Детали ингредиента'}>
+              <IngredientDetails />
+            </Wrapper>
+          }
+        />
         {/* Маршрут если есть регистрация */}
         <Route element={<ProtectedRoute forAuthorizedUsers />}>
           <Route path='/profile' element={<Profile />} />
           <Route path='/profile/orders' element={<ProfileOrders />} />
+          <Route
+            path='/profile/orders/:id'
+            element={
+              <Wrapper title={`#${orderNumber}`}>
+                <OrderInfo />
+              </Wrapper>
+            }
+          />
         </Route>
         {/* Маршруты если нету регистрации */}
         <Route element={<ProtectedRoute forAuthorizedUsers={false} />}>
@@ -68,18 +101,18 @@ const App = () => {
         {backgroundLocation && (
           <>
             <Route
-              path='/feed/:number'
+              path='/feed/:id'
               element={
-                <Modal title='Заказ по номеру' onClose={closeModal}>
+                <Modal title={`#${orderNumber}`} onClose={closeModal}>
                   <OrderInfo />
                 </Modal>
               }
             />
             <Route element={<ProtectedRoute forAuthorizedUsers />}>
               <Route
-                path='/profile/orders/:number'
+                path='/profile/orders/:id'
                 element={
-                  <Modal title='Заказ по номеру' onClose={closeModal}>
+                  <Modal title={`#${orderNumber}`} onClose={closeModal}>
                     <OrderInfo />
                   </Modal>
                 }
@@ -88,7 +121,7 @@ const App = () => {
             <Route
               path='/ingredients/:id'
               element={
-                <Modal title='Ингредиент' onClose={closeModal}>
+                <Modal title='Детали ингредиента' onClose={closeModal}>
                   <IngredientDetails />
                 </Modal>
               }

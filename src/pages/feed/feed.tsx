@@ -13,7 +13,6 @@ export const Feed: FC = () => {
   // const orders: TOrder[] = [];
   const { feed } = useSelector(getOrdersSelectors);
   const orders: TOrder[] = feed;
-
   const dispatch = useDispatch();
 
   const handleGetFeeds = () => {
