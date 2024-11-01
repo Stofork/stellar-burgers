@@ -82,7 +82,12 @@ export const burgerConstructorSlice = createSlice({
   }
 });
 
-export const { getConstructor } = burgerConstructorSlice.selectors;
+export const burgerConstructorSliceReducer = burgerConstructorSlice.reducer;
+
+// Экспортируем редюсер по умолчанию
+export default burgerConstructorSlice.reducer;
+
+// Экспорт действий
 export const {
   addIngredient,
   deleteIngredient,
@@ -90,4 +95,8 @@ export const {
   moveDownIngredient,
   resetConstructor
 } = burgerConstructorSlice.actions;
-export const burgerConstructorSliceReducer = burgerConstructorSlice.reducer;
+
+// Если вам нужны селекторы, добавьте их здесь
+export const getConstructor = (state: {
+  burgerConstructor: TBurgerConstructor;
+}) => state.burgerConstructor;
